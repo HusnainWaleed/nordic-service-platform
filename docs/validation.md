@@ -6,4 +6,4 @@ Local verification on Windows with Python 3.12, 23 October 2026:
 
 Portfolio-wide smoke checks: sample HTTP health endpoint returned 200; deployment generator produced a two-resource bundle; backup/restore recovered two synthetic records; triage processed three known scenarios and abstained on an unknown reason.
 
-Docker and Kubernetes were not running, so image build, Kubernetes API validation and deployment have not been executed. GitHub Actions execution is pending publication. These results are local lab evidence, not production metrics.
+Docker and Kubernetes were not running, so image build, Kubernetes API validation and deployment have not been executed. The initial GitHub Actions run passed on publication; subsequent CI runs are linked from the README badge. These results are local lab evidence, not production metrics.

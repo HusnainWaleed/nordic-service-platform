@@ -1,5 +1,7 @@
 # Nordic Service Platform
 
+[![checks](https://github.com/HusnainWaleed/nordic-service-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/HusnainWaleed/nordic-service-platform/actions/workflows/ci.yml)
+
 A small deployment golden path for a fictional IT team moving from manual application setup to Kubernetes. Built as Husnain Waleed's personal platform engineering lab, connecting infrastructure support with developer self-service.
 
 **Implemented:** input validation, digest-only image references, deployment bundle generation, a sample HTTP service, container recipe and automated tests. **Next:** GitOps reconciliation, build-and-scan pipeline and measured onboarding time. Kubernetes execution has not yet been validated in this environment.
