@@ -23,3 +23,21 @@ jobs:
         run: docker build --pull --tag nordic-service:ci .
       - name: Verify restricted container behavior
         run: python scripts/container_smoke.py --image nordic-service:ci
+  kubernetes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install checksum-verified kind v0.33.0
+        shell: bash
+        run: |
+          curl --fail --location --output "$RUNNER_TEMP/kind" https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64
+          curl --fail --location --output "$RUNNER_TEMP/kind.sha256" https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64.sha256sum
+          python -c "import hashlib,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP']); actual=hashlib.sha256((p/'kind').read_bytes()).hexdigest(); expected=(p/'kind.sha256').read_text().split()[0]; assert actual == expected, 'kind checksum mismatch'"
+          chmod +x "$RUNNER_TEMP/kind"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Deploy and verify in a disposable cluster
+        run: python scripts/kubernetes_smoke.py
