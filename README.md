@@ -4,7 +4,7 @@
 
 A small deployment golden path for a fictional IT team moving from manual application setup to Kubernetes. Built as Husnain Waleed's personal platform engineering lab, connecting infrastructure support with developer self-service.
 
-**Implemented:** input validation, digest-only image references, deployment bundle generation, a sample HTTP service, container recipe and automated tests. **Next:** GitOps reconciliation, build-and-scan pipeline and measured onboarding time. Kubernetes execution has not yet been validated in this environment.
+**Implemented:** input validation, digest-only image references, deployment bundle generation, a sample HTTP service, container recipe, HTTP contract tests and a CI container build/runtime check. **Next:** Kubernetes deployment validation, GitOps reconciliation, image security scanning and measured onboarding time. Kubernetes execution has not yet been validated in this environment.
 
 ```mermaid
 flowchart LR
@@ -23,6 +23,8 @@ python app.py
 ```
 
 ## Deployment workflow
+For image build and restricted runtime checks, follow [container validation](docs/container-validation.md). CI builds a test image without publishing it and checks health and failure responses under the container security restrictions.
+
 Build and push the sample image to a registry you control. Record its real digest; the generator rejects mutable tags. The image below is illustrative and cannot be pulled.
 ```sh
 python platform_cli.py workplace-status --owner lab-team --image ghcr.io/example/workplace-status@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --output service.json
