@@ -2,7 +2,7 @@
 
 [![checks](https://github.com/HusnainWaleed/nordic-service-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/HusnainWaleed/nordic-service-platform/actions/workflows/ci.yml)
 
-A small deployment golden path for a fictional IT team moving from manual application setup to Kubernetes, connecting infrastructure support with developer self-service.
+A small deployment golden path for a fictional IT team moving from manual application setup to Kubernetes. Built as Husnain Waleed's personal platform engineering lab, connecting infrastructure support with developer self-service.
 
 **Implemented:** validated deployment generation with digest-only registry images, an explicit preloaded-image lab mode, a sample HTTP service, container runtime checks, disposable Kubernetes validation and an image vulnerability CI policy. **Next:** GitOps reconciliation and rollback, observability and measured onboarding time. The workstation Docker engine is unavailable; container and Kubernetes execution evidence comes from hosted CI, not a local workstation deployment.
 
@@ -26,6 +26,8 @@ python app.py
 For image build and restricted runtime checks, follow [container validation](docs/container-validation.md). CI builds a test image without publishing it and checks health and failure responses under the container security restrictions.
 
 Use [disposable Kubernetes validation](docs/kubernetes-validation.md) to exercise the deployment in an isolated kind cluster. See [image security](docs/image-security.md) for the vulnerability gate, report artifacts and remediation workflow. A configured check is only validated when its CI job passes.
+
+The [GitOps lab](docs/gitops-lab.md) adds Flux reconciliation from a pinned public Git revision and a replica-drift recovery experiment in a disposable cluster. A failed-release/revert rollback experiment remains future work.
 
 Build and push the sample image to a registry you control. Record its real digest; the generator rejects mutable tags. The image below is illustrative and cannot be pulled.
 ```sh
