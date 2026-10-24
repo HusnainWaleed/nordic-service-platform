@@ -24,6 +24,7 @@ def verify(branch, revision):
         def kube(*args):
             return run('kubectl', '--kubeconfig', kubeconfig, '--context', 'kind-'+name, *args)
         def flux(*args):
+            print('Flux stage: ' + ' '.join(args), flush=True)
             return run('flux', '--kubeconfig', kubeconfig, '--context', 'kind-'+name, *args, timeout=420)
         try:
             # One fixed fixture tag is used only inside this isolated cluster.
@@ -55,7 +56,8 @@ def verify(branch, revision):
             print('PASS: injected replica drift was corrected from 2 to 1')
         except Exception:
             if Path(kubeconfig).exists():
-                for args in [('get', 'pods', '-A'), ('get', 'events', '-A', '--sort-by=.metadata.creationTimestamp')]:
+                for args in [('get', 'pods', '-A'), ('get', 'events', '-A', '--sort-by=.metadata.creationTimestamp'),
+                             ('-n', 'flux-system', 'get', 'gitrepositories,kustomizations', '-o', 'yaml')]:
                     try: print(kube(*args))
                     except Exception as error: print(error)
             raise

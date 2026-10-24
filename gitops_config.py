@@ -13,6 +13,6 @@ def resources(branch, revision):
                   'ref': {'branch': branch, 'commit': revision}}},
         {'apiVersion': 'kustomize.toolkit.fluxcd.io/v1', 'kind': 'Kustomization',
          'metadata': {'name': 'workplace', 'namespace': 'flux-system'},
-         'spec': {'interval': '30s', 'path': './gitops/app', 'prune': True, 'wait': True,
+         'spec': {'interval': '30s', 'path': './gitops/app', 'targetNamespace': 'default', 'prune': True, 'wait': True,
                   'timeout': '120s', 'sourceRef': {'kind': 'GitRepository', 'name': 'workplace'}}}
     ]}

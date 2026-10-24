@@ -13,6 +13,7 @@ class GitOpsConfigTests(unittest.TestCase):
         self.assertTrue(apply['spec']['wait'])
         self.assertTrue(apply['spec']['prune'])
         self.assertEqual(apply['spec']['path'], './gitops/app')
+        self.assertEqual(apply['spec']['targetNamespace'], 'default')
     def test_mutable_or_invalid_revisions_are_rejected(self):
         for revision in ['main', '', 'a'*39, 'z'*40]:
             with self.subTest(revision=revision), self.assertRaises(ValueError): resources('main', revision)
