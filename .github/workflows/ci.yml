@@ -78,3 +78,29 @@ jobs:
             work/scanned-image-id.txt
           if-no-files-found: warn
           retention-days: 14
+  gitops:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install checksum-verified kind and Flux
+        shell: bash
+        run: |
+          curl --fail --location --output "$RUNNER_TEMP/kind" https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64
+          curl --fail --location --output "$RUNNER_TEMP/kind.sha256" https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64.sha256sum
+          python -c "import hashlib,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP']); assert hashlib.sha256((p/'kind').read_bytes()).hexdigest() == (p/'kind.sha256').read_text().split()[0], 'kind checksum mismatch'"
+          chmod +x "$RUNNER_TEMP/kind"
+          curl --fail --location --output "$RUNNER_TEMP/flux.tar.gz" https://github.com/fluxcd/flux2/releases/download/v2.9.6/flux_2.9.6_linux_amd64.tar.gz
+          python -c "import hashlib,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP'])/'flux.tar.gz'; assert hashlib.sha256(p.read_bytes()).hexdigest() == 'b4d22673e9246cbd628881f1a9ef3b090085dced291e42d804555cee8e8d42c5', 'Flux checksum mismatch'"
+          tar -xzf "$RUNNER_TEMP/flux.tar.gz" -C "$RUNNER_TEMP" flux
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Verify Git reconciliation and replica drift recovery
+        env:
+          GITOPS_BRANCH: ${{ github.head_ref || github.ref_name }}
+          GITOPS_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python scripts/flux_smoke.py --branch "$GITOPS_BRANCH" --revision "$GITOPS_REVISION"
