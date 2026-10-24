@@ -41,3 +41,40 @@ jobs:
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
       - name: Deploy and verify in a disposable cluster
         run: python scripts/kubernetes_smoke.py
+  image-security:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Build image for scanning
+        run: docker build --pull --tag nordic-service:scan .
+      - name: Install checksum-verified Trivy v0.76.1
+        shell: bash
+        run: |
+          curl --fail --location --output "$RUNNER_TEMP/trivy.tar.gz" https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_Linux-64bit.tar.gz
+          curl --fail --location --output "$RUNNER_TEMP/trivy-checksums.txt" https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_checksums.txt
+          python -c "import hashlib,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP']); expected=[line.split()[0] for line in (p/'trivy-checksums.txt').read_text().splitlines() if line.split()[-1].lstrip('*') == 'trivy_0.76.1_Linux-64bit.tar.gz']; assert len(expected) == 1 and hashlib.sha256((p/'trivy.tar.gz').read_bytes()).hexdigest() == expected[0], 'Trivy checksum mismatch'"
+          tar -xzf "$RUNNER_TEMP/trivy.tar.gz" -C "$RUNNER_TEMP" trivy
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Save complete vulnerability report
+        run: |
+          mkdir -p work
+          trivy --version > work/trivy-version.txt
+          docker image inspect nordic-service:scan --format '{{.Id}}' > work/scanned-image-id.txt
+          trivy image --image-src docker --scanners vuln --timeout 10m --format json --output work/trivy-image.json --exit-code 0 nordic-service:scan
+      - name: Enforce image vulnerability policy
+        run: python scripts/image_policy.py work/trivy-image.json
+      - name: Preserve scan evidence even when the policy fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-security-report
+          path: |
+            work/trivy-image.json
+            work/trivy-version.txt
+            work/scanned-image-id.txt
+          if-no-files-found: warn
+          retention-days: 14
