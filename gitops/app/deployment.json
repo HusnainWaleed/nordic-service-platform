@@ -60,7 +60,7 @@
             },
             "readinessProbe": {
               "httpGet": {
-                "path": "/not-ready",
+                "path": "/healthz",
                 "port": 8080
               },
               "initialDelaySeconds": 2
@@ -78,4 +78,3 @@
     }
   }
 }
-

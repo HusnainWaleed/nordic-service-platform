@@ -20,6 +20,6 @@ The checkout must match the supplied revision. CI passes the pull request head r
 ## Rollback runbook and remaining experiment
 For a future Git-managed release failure, revert the responsible Git change through review, reconcile the source, wait for the Kustomization's Ready condition and verify the application and applied revision. Do not treat `kubectl rollout undo` as a durable rollback while Flux is reconciling the unchanged Git desired state; the controller can overwrite that manual change.
 
-A failed-release and revert experiment, HTTP verification after reconciliation, controller observability and a restricted service-account design remain future work. Controller installation here uses cluster-admin permissions inside an ephemeral cluster only. No production readiness or local workstation execution is claimed. Actual execution evidence comes from a successful `gitops` CI job.
+The optional [rollback drill](rollback-drill.md) adds a bad Git revision, a recovery commit and Service HTTP verification before and after recovery. Controller observability and a restricted service-account design remain future work. Controller installation here uses cluster-admin permissions inside an ephemeral cluster only. No production readiness or local workstation execution is claimed. Actual execution evidence comes from a successful `gitops` CI job.
 
 References: https://fluxcd.io/flux/faq/ and https://fluxcd.io/flux/components/kustomize/kustomizations/

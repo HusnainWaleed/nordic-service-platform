@@ -27,7 +27,7 @@ For image build and restricted runtime checks, follow [container validation](doc
 
 Use [disposable Kubernetes validation](docs/kubernetes-validation.md) to exercise the deployment in an isolated kind cluster. See [image security](docs/image-security.md) for the vulnerability gate, report artifacts and remediation workflow. A configured check is only validated when its CI job passes.
 
-The [GitOps lab](docs/gitops-lab.md) adds Flux reconciliation from a pinned public Git revision and a replica-drift recovery experiment in a disposable cluster. A failed-release/revert rollback experiment remains future work.
+The [GitOps lab](docs/gitops-lab.md) adds Flux reconciliation from a pinned public Git revision and replica-drift recovery in a disposable cluster. The [rollback drill](docs/rollback-drill.md) promotes a deliberately bad readiness revision, requires controller evidence of failure, then restores a healthy Git revision and verifies Service health. Its CI artifact records exact revisions and the measured lab recovery interval.
 
 Build and push the sample image to a registry you control. Record its real digest; the generator rejects mutable tags. The image below is illustrative and cannot be pulled.
 ```sh
