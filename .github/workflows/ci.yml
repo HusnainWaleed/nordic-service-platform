@@ -99,8 +99,16 @@ jobs:
           python -c "import hashlib,os,pathlib; p=pathlib.Path(os.environ['RUNNER_TEMP'])/'flux.tar.gz'; assert hashlib.sha256(p.read_bytes()).hexdigest() == 'b4d22673e9246cbd628881f1a9ef3b090085dced291e42d804555cee8e8d42c5', 'Flux checksum mismatch'"
           tar -xzf "$RUNNER_TEMP/flux.tar.gz" -C "$RUNNER_TEMP" flux
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
-      - name: Verify Git reconciliation and replica drift recovery
+      - name: Verify Git reconciliation drift recovery and failed-release rollback
         env:
           GITOPS_BRANCH: ${{ github.head_ref || github.ref_name }}
           GITOPS_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: python scripts/flux_smoke.py --branch "$GITOPS_BRANCH" --revision "$GITOPS_REVISION"
+        run: python scripts/flux_smoke.py --branch "$GITOPS_BRANCH" --revision "$GITOPS_REVISION" --rollback
+      - name: Preserve rollback evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitops-rollback-evidence
+          path: work/rollback-evidence.json
+          if-no-files-found: warn
+          retention-days: 14
