@@ -29,6 +29,8 @@ Use [disposable Kubernetes validation](docs/kubernetes-validation.md) to exercis
 
 The [GitOps lab](docs/gitops-lab.md) adds Flux reconciliation from a pinned public Git revision and replica-drift recovery in a disposable cluster. The [rollback drill](docs/rollback-drill.md) promotes a deliberately bad readiness revision, requires controller evidence of failure, then restores a healthy Git revision and verifies Service health. Its CI artifact records exact revisions and the measured lab recovery interval.
 
+The [observability lab](docs/observability.md) adds bounded request metrics and structured request logs. Its CI experiment runs real Prometheus scraping and queries in isolated Docker containers; this is not a deployed Kubernetes monitoring stack.
+
 Build and push the sample image to a registry you control. Record its real digest; the generator rejects mutable tags. The image below is illustrative and cannot be pulled.
 ```sh
 python platform_cli.py workplace-status --owner lab-team --image ghcr.io/example/workplace-status@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --output service.json
