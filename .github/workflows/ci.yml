@@ -78,6 +78,26 @@ jobs:
             work/scanned-image-id.txt
           if-no-files-found: warn
           retention-days: 14
+  observability:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Build observable sample image
+        run: docker build --pull --tag nordic-service:metrics .
+      - name: Verify actual Prometheus scraping and queries
+        run: python scripts/observability_smoke.py --image nordic-service:metrics
+      - name: Preserve observability evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observability-evidence
+          path: work/observability-evidence.json
+          if-no-files-found: warn
+          retention-days: 14
   gitops:
     runs-on: ubuntu-24.04
     timeout-minutes: 20

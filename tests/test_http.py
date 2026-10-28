@@ -4,13 +4,13 @@ import unittest
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
-from app import Handler, ThreadingHTTPServer
+from app import Handler, ServiceServer
 
 
 class HttpContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+        cls.server = ServiceServer(('127.0.0.1', 0), Handler)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
         cls.base = f'http://127.0.0.1:{cls.server.server_port}'
